@@ -15,15 +15,13 @@ let componentes = [];
 // TOGGLE DETALLE
 // ════════════════════════════════════════════════════════════════════════════
 function toggleDetail(id) {
-  const detail = document.getElementById("detail-" + id);
-  const row = document.querySelector(`[data-idx="${id}"]`);
-  const arrow = row.querySelector(".comp-arrow");
-  if (detail.style.display === "none") {
-    detail.style.display = "table-row";
+  const card = document.getElementById("card-" + id);
+  const arrow = card.querySelector(".comp-arrow");
+  card.classList.toggle("open");
+  if (card.classList.contains("open")) {
     arrow.textContent = "▼";
     arrow.style.color = LIME;
   } else {
-    detail.style.display = "none";
     arrow.textContent = "▶";
     arrow.style.color = GREY;
   }
@@ -120,60 +118,26 @@ function renderCPUs() {
     return activeBrands.includes(marca);
   });
 
-  let html = `<table class="comp-table"><thead><tr><th>Procesador</th><th>Score</th></tr></thead><tbody>`;
+  let html = "";
   filtrados.forEach((cpu, i) => {
     const color = scoreColor(cpu.score);
     html += `
-      <tr class="comp-row" data-idx="cpu-${i}" onclick="toggleDetail('cpu-${i}')">
-        <td class="comp-name"><span class="comp-arrow">▶</span> ${cpu.nombre}</td>
-        <td><span style="color:${color};font-weight:700;">${cpu.score}/100</span></td>
-      </tr>
-      <tr class="comp-detail" id="detail-cpu-${i}" style="display:none;">
-        <td colspan="2"><div class="detail-grid">
+      <div class="comp-card" id="card-cpu-${i}" onclick="toggleDetail('cpu-${i}')">
+        <div class="comp-card-head">
+          <div class="comp-card-name"><span class="comp-arrow">▶</span> ${cpu.nombre}</div>
+          <div class="comp-card-score" style="color:${color};">${cpu.score}/100</div>
+        </div>
+        <div class="comp-card-detail"><div class="detail-grid">
           <div>🧠 <b>Núcleos:</b> ${cpu.nucleos} / ${cpu.hilos} hilos</div>
           <div>⚡ <b>TDP:</b> ${cpu.tdp} W</div>
           <div>🔌 <b>Socket:</b> ${cpu.socket}</div>
           <div>🏷️ <b>Gen:</b> ${cpu.gen}</div>
           <div>💲 <b>Precio:</b> $${cpu.precio} USD</div>
           <div>📅 <b>Vida útil:</b> ${cpu.vida_anos} años</div>
-        </div></td>
-      </tr>`;
+        </div></div>
+      </div>`;
   });
-  html += "</tbody></table>";
   container.innerHTML = html;
-  renderCPUChart();
-}
-
-function renderCPUChart() {
-  destroyChart("cpu-chart");
-  const ctx = document.getElementById("cpu-chart");
-  new Chart(ctx, {
-    type: "scatter",
-    data: {
-      datasets: [{
-        label: "Procesadores",
-        data: PROCESADORES.map(c => ({ x: c.precio, y: c.score, label: c.nombre })),
-        backgroundColor: PROCESADORES.map(c => scoreColor(c.score)),
-        pointRadius: 7,
-        pointHoverRadius: 9
-      }]
-    },
-    options: {
-      ...chartDefaultOptions,
-      plugins: {
-        ...chartDefaultOptions.plugins,
-        legend: { display: false },
-        tooltip: {
-          ...chartDefaultOptions.plugins.tooltip,
-          callbacks: { label: (ctx) => `${ctx.raw.label}: $${ctx.raw.x} | Score ${ctx.raw.y}` }
-        }
-      },
-      scales: {
-        x: { ...chartDefaultOptions.scales.x, title: { display: true, text: "Precio (USD)", color: GREY } },
-        y: { ...chartDefaultOptions.scales.y, title: { display: true, text: "Score", color: GREY } }
-      }
-    }
-  });
 }
 
 document.querySelectorAll("#cpu-filter .chip").forEach(chip => {
@@ -188,50 +152,26 @@ function renderGPUs() {
   const container = document.getElementById("gpu-cards");
   const filtrados = GRAFICAS.filter(gpu => activeBrands.includes(gpu.marca));
 
-  let html = `<table class="comp-table"><thead><tr><th>Tarjeta Gráfica</th><th>Score</th></tr></thead><tbody>`;
+  let html = "";
   filtrados.forEach((gpu, i) => {
     const color = scoreColor(gpu.score);
     const colorMarca = gpu.marca === "NVIDIA" ? "#76b900" : "#ed1c24";
     html += `
-      <tr class="comp-row" data-idx="gpu-${i}" onclick="toggleDetail('gpu-${i}')">
-        <td class="comp-name"><span class="comp-arrow">▶</span> ${gpu.nombre}</td>
-        <td><span style="color:${color};font-weight:700;">${gpu.score}/100</span></td>
-      </tr>
-      <tr class="comp-detail" id="detail-gpu-${i}" style="display:none;">
-        <td colspan="2"><div class="detail-grid">
+      <div class="comp-card" id="card-gpu-${i}" onclick="toggleDetail('gpu-${i}')">
+        <div class="comp-card-head">
+          <div class="comp-card-name"><span class="comp-arrow">▶</span> ${gpu.nombre}</div>
+          <div class="comp-card-score" style="color:${color};">${gpu.score}/100</div>
+        </div>
+        <div class="comp-card-detail"><div class="detail-grid">
           <div>🖼️ <b>VRAM:</b> ${gpu.vram} GB</div>
           <div>⚡ <b>TDP:</b> ${gpu.tdp} W</div>
           <div>💲 <b>Precio:</b> $${gpu.precio} USD</div>
           <div>🏷️ <b>Marca:</b> <span style="color:${colorMarca}">${gpu.marca}</span></div>
           <div>📅 <b>Vida útil:</b> ${gpu.vida_anos} años</div>
-        </div></td>
-      </tr>`;
+        </div></div>
+      </div>`;
   });
-  html += "</tbody></table>";
   container.innerHTML = html;
-  renderGPUChart();
-}
-
-function renderGPUChart() {
-  destroyChart("gpu-chart");
-  const ctx = document.getElementById("gpu-chart");
-  const sorted = [...GRAFICAS].sort((a, b) => a.score - b.score);
-  new Chart(ctx, {
-    type: "bar",
-    data: {
-      labels: sorted.map(g => g.nombre),
-      datasets: [{ label: "Score", data: sorted.map(g => g.score), backgroundColor: sorted.map(g => g.marca === "NVIDIA" ? "#76b900" : "#ed1c24") }]
-    },
-    options: {
-      ...chartDefaultOptions,
-      indexAxis: "y",
-      plugins: { ...chartDefaultOptions.plugins, legend: { display: false } },
-      scales: {
-        x: { ...chartDefaultOptions.scales.x, title: { display: true, text: "Score", color: GREY } },
-        y: { ...chartDefaultOptions.scales.y, ticks: { color: GREY, font: { size: 10 } } }
-      }
-    }
-  });
 }
 
 document.querySelectorAll("#gpu-filter .chip").forEach(chip => {
@@ -246,78 +186,30 @@ function renderRAMs() {
   const container = document.getElementById("ram-cards");
   const filtradas = RAMS.filter(r => activeTypes.includes(r.tipo));
 
-  let html = `<table class="comp-table"><thead><tr><th>Memoria RAM</th><th>Score</th></tr></thead><tbody>`;
+  let html = "";
   filtradas.forEach((ram, i) => {
     const color = scoreColor(ram.score);
     const colorTipo = ram.tipo === "DDR5" ? LIME : GREY;
     html += `
-      <tr class="comp-row" data-idx="ram-${i}" onclick="toggleDetail('ram-${i}')">
-        <td class="comp-name"><span class="comp-arrow">▶</span> ${ram.nombre}</td>
-        <td><span style="color:${color};font-weight:700;">${ram.score}/100</span></td>
-      </tr>
-      <tr class="comp-detail" id="detail-ram-${i}" style="display:none;">
-        <td colspan="2"><div class="detail-grid">
+      <div class="comp-card" id="card-ram-${i}" onclick="toggleDetail('ram-${i}')">
+        <div class="comp-card-head">
+          <div class="comp-card-name"><span class="comp-arrow">▶</span> ${ram.nombre}</div>
+          <div class="comp-card-score" style="color:${color};">${ram.score}/100</div>
+        </div>
+        <div class="comp-card-detail"><div class="detail-grid">
           <div>📦 <b>Capacidad:</b> ${ram.capacidad} GB</div>
           <div>⚡ <b>Velocidad:</b> ${ram.velocidad} MT/s</div>
           <div>⏱️ <b>Latencia:</b> ${ram.latencia}</div>
           <div>🏷️ <b>Tipo:</b> <span style="color:${colorTipo}">${ram.tipo}</span></div>
           <div>💲 <b>Precio:</b> $${ram.precio} USD</div>
           <div>📅 <b>Vida útil:</b> ${ram.vida_anos} años</div>
-        </div></td>
-      </tr>`;
+        </div></div>
+      </div>`;
   });
-  html += "</tbody></table>";
   container.innerHTML = html;
 
-  const chartSection = document.getElementById("ram-chart-section");
   const emptyMsg = document.getElementById("ram-empty");
-  if (filtradas.length === 0) {
-    chartSection.style.display = "none";
-    emptyMsg.style.display = "block";
-  } else {
-    chartSection.style.display = "block";
-    emptyMsg.style.display = "none";
-    renderRAMChart(filtradas);
-  }
-}
-
-function renderRAMChart(filtradas) {
-  destroyChart("ram-chart");
-  const ctx = document.getElementById("ram-chart");
-  const speeds = filtradas.map(r => r.velocidad);
-  const minS = Math.min(...speeds), maxS = Math.max(...speeds);
-  function speedColor(v) {
-    const t = maxS === minS ? 0.5 : (v - minS) / (maxS - minS);
-    if (t < 0.5) return interpolateColor("#e3b341", LIME_D, t * 2);
-    return interpolateColor(LIME_D, LIME, (t - 0.5) * 2);
-  }
-  new Chart(ctx, {
-    type: "scatter",
-    data: {
-      datasets: [{
-        label: "Memorias RAM",
-        data: filtradas.map(r => ({ x: r.precio, y: r.capacidad, label: r.nombre, vel: r.velocidad, score: r.score })),
-        backgroundColor: filtradas.map(r => speedColor(r.velocidad)),
-        pointRadius: filtradas.map(r => 5 + (r.score / 100) * 12),
-        pointHoverRadius: filtradas.map(r => 7 + (r.score / 100) * 12)
-      }]
-    },
-    options: {
-      ...chartDefaultOptions,
-      plugins: {
-        ...chartDefaultOptions.plugins,
-        legend: { display: false },
-        tooltip: {
-          ...chartDefaultOptions.plugins.tooltip,
-          callbacks: { label: (ctx) => `${ctx.raw.label}: $${ctx.raw.x} | ${ctx.raw.y} GB | ${ctx.raw.vel} MT/s` }
-        }
-      },
-      scales: {
-        x: { ...chartDefaultOptions.scales.x, title: { display: true, text: "Precio (USD)", color: GREY } },
-        y: { ...chartDefaultOptions.scales.y, title: { display: true, text: "Capacidad (GB)", color: GREY } }
-      }
-    }
-  });
+  emptyMsg.style.display = filtradas.length === 0 ? "block" : "none";
 }
 
 document.querySelectorAll("#ram-filter .chip").forEach(chip => {

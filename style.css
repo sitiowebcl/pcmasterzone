@@ -201,64 +201,88 @@ h1, h2, h3, h4 {
   font-size: 0.9rem;
 }
 
-/* ── Tabla de componentes (CPU/GPU/RAM) ─────────────────────────────────── */
-.comp-table {
-  width: 100%;
-  border-collapse: collapse;
+/* ── Grid de cards (CPU/GPU/RAM) ────────────────────────────────────────── */
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-bottom: 16px;
+}
+@media (max-width: 760px) {
+  .cards-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.badge {
+  display: inline-block;
+  background: rgba(198, 241, 39, 0.1);
+  color: var(--lime);
+  border: 1px solid var(--lime-d);
+  border-radius: 20px;
+  padding: 2px 10px;
+  font-size: 0.78rem;
+}
+.score-tag {
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+/* ── Cards expandibles de componentes ───────────────────────────────────── */
+.comp-card {
   background: var(--panel);
   border: 1px solid var(--border);
   border-radius: 12px;
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s;
   overflow: hidden;
 }
-.comp-table thead th {
-  text-align: left;
-  padding: 10px 16px;
-  font-family: 'Orbitron', sans-serif;
-  font-size: 0.78rem;
-  letter-spacing: 0.5px;
-  color: var(--grey);
-  border-bottom: 1px solid var(--border);
+.comp-card:hover {
+  border-color: var(--lime);
+  box-shadow: 0 0 16px rgba(198, 241, 39, 0.13);
 }
-.comp-table thead th:last-child {
-  text-align: right;
+.comp-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  gap: 12px;
 }
-.comp-row {
-  cursor: pointer;
-  transition: background 0.15s ease;
-}
-.comp-row:hover {
-  background: rgba(198, 241, 39, 0.06);
-}
-.comp-row td {
-  padding: 12px 16px;
-  border-bottom: 1px solid var(--border);
-  font-size: 0.92rem;
-}
-.comp-row td:last-child {
-  text-align: right;
-}
-.comp-name {
+.comp-card-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-weight: 700;
+  font-size: 1rem;
   color: var(--white);
 }
 .comp-arrow {
   display: inline-block;
-  width: 16px;
+  width: 14px;
   color: var(--grey);
-  margin-right: 6px;
   font-size: 0.75rem;
   transition: color 0.15s ease;
+  flex-shrink: 0;
 }
-.comp-detail td {
-  padding: 0 16px 16px 16px;
-  border-bottom: 1px solid var(--border);
-  background: rgba(198, 241, 39, 0.03);
+.comp-card-score {
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 700;
+  font-size: 1rem;
+  white-space: nowrap;
+}
+.comp-card-detail {
+  display: none;
+  padding: 0 20px 18px 20px;
+  border-top: 1px solid var(--border);
+}
+.comp-card.open .comp-card-detail {
+  display: block;
 }
 .detail-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 8px 24px;
-  padding: 12px 4px 4px 28px;
+  padding-top: 14px;
   font-size: 0.88rem;
   color: var(--grey);
 }
