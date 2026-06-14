@@ -37,6 +37,7 @@ h1, h2, h3, h4 {
   display: flex;
   justify-content: center;
   margin: 12px 0 8px;
+  position: relative;
 }
 .logo-wrap img {
   max-width: 260px;
