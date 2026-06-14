@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PC Master Zone</title>
+  <meta name="description" content="Comparador de componentes PC: procesadores, tarjetas gráficas, memorias RAM, rankings, presupuesto y vida útil del hardware.">
+  <meta name="theme-color" content="#0A0A0A">
+  <link rel="icon" href="icons/icon-192.png" type="image/png">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="container">
+
+    <!-- Logo -->
+    <div class="logo-wrap">
+      <img src="imagenes/logo.png" alt="PC Master Zone">
+    </div>
+
+    <!-- Navbar -->
+    <div class="navbar">
+      <div class="navbar-inner" id="navbar">
+        <button class="nav-btn active" data-section="componentes">COMPONENTES</button>
+        <button class="nav-btn" data-section="versus">VERSUS</button>
+        <button class="nav-btn" data-section="ranking">RANKING</button>
+        <button class="nav-btn" data-section="presupuesto">PRESUPUESTO PC</button>
+        <button class="nav-btn" data-section="vidautil">VIDA ÚTIL</button>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════ COMPONENTES ════════════════════════════════ -->
+    <section class="section active" id="section-componentes">
+
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="cpu">Procesadores</button>
+        <button class="tab-btn" data-tab="gpu">Tarjetas Gráficas</button>
+        <button class="tab-btn" data-tab="ram">Memoria RAM</button>
+      </div>
+
+      <!-- Tab CPU -->
+      <div class="tab-panel active" id="tab-cpu">
+        <h4>Procesadores disponibles</h4>
+        <div class="filter-row">
+          <span class="filter-label">Filtrar por fabricante</span>
+          <div class="chip-group" id="cpu-filter">
+            <div class="chip active" data-value="Intel">Intel</div>
+            <div class="chip active" data-value="AMD">AMD</div>
+          </div>
+        </div>
+        <div class="cards-grid" id="cpu-cards"></div>
+        <div class="divider"></div>
+        <div class="chart-title">📊 Comparativa de rendimiento vs precio</div>
+        <div class="chart-wrap"><canvas id="cpu-chart"></canvas></div>
+      </div>
+
+      <!-- Tab GPU -->
+      <div class="tab-panel" id="tab-gpu">
+        <h4>Tarjetas Gráficas disponibles</h4>
+        <div class="filter-row">
+          <span class="filter-label">Filtrar por fabricante</span>
+          <div class="chip-group" id="gpu-filter">
+            <div class="chip active" data-value="NVIDIA">NVIDIA</div>
+            <div class="chip active" data-value="AMD">AMD</div>
+          </div>
+        </div>
+        <div class="cards-grid" id="gpu-cards"></div>
+        <div class="divider"></div>
+        <div class="chart-title">📊 VRAM vs Score</div>
+        <div class="chart-wrap"><canvas id="gpu-chart"></canvas></div>
+      </div>
+
+      <!-- Tab RAM -->
+      <div class="tab-panel" id="tab-ram">
+        <h4>Memorias RAM disponibles</h4>
+        <div class="filter-row">
+          <span class="filter-label">Filtrar por tipo</span>
+          <div class="chip-group" id="ram-filter">
+            <div class="chip active" data-value="DDR5">DDR5</div>
+            <div class="chip active" data-value="DDR4">DDR4</div>
+          </div>
+        </div>
+        <div class="cards-grid" id="ram-cards"></div>
+        <div id="ram-chart-section">
+          <div class="divider"></div>
+          <div class="chart-title">📊 Comparativa de capacidad vs precio</div>
+          <div class="chart-wrap"><canvas id="ram-chart"></canvas></div>
+        </div>
+        <div class="info-box" id="ram-empty" style="display:none;">Selecciona al menos un tipo de RAM para ver resultados.</div>
+      </div>
+
+    </section>
+
+    <!-- ════════════════════════════════ VERSUS ════════════════════════════════ -->
+    <section class="section" id="section-versus">
+      <div class="section-header">
+        <h1>⚔️ <span>VERSUS</span></h1>
+        <p>Compara dos componentes lado a lado.</p>
+      </div>
+
+      <div class="tabs">
+        <button class="tab-btn active" data-vstype="cpu">Procesadores</button>
+        <button class="tab-btn" data-vstype="gpu">Tarjetas Gráficas</button>
+        <button class="tab-btn" data-vstype="ram">Memoria RAM</button>
+      </div>
+
+      <div class="vs-selects">
+        <div>
+          <span class="filter-label">Componente A</span>
+          <select id="vs-select-a"></select>
+        </div>
+        <div class="vs-label">VS</div>
+        <div>
+          <span class="filter-label">Componente B</span>
+          <select id="vs-select-b"></select>
+        </div>
+      </div>
+
+      <div id="vs-warning" class="info-box" style="display:none;">Selecciona dos componentes distintos para comparar.</div>
+
+      <div id="vs-result" style="display:none;">
+        <div class="divider"></div>
+        <table class="vs-table" id="vs-table"></table>
+
+        <div class="chart-title">📡 Comparativa radar (score normalizado)</div>
+        <div class="chart-wrap"><canvas id="vs-radar"></canvas></div>
+
+        <div class="winner-banner" id="vs-winner"></div>
+      </div>
+    </section>
+
+    <!-- ════════════════════════════════ RANKING ════════════════════════════════ -->
+    <section class="section" id="section-ranking">
+      <div class="section-header">
+        <h1>🏆 <span>RANKING</span> DE COMPUTADORES</h1>
+        <p>Los mejores builds ordenados por rendimiento general.</p>
+      </div>
+
+      <div class="slider-row">
+        <span class="filter-label">Filtrar por precio máximo (USD): <span class="slider-value" id="price-slider-value">5000</span></span>
+        <input type="range" id="price-slider" min="500" max="5000" step="100" value="5000">
+      </div>
+
+      <div id="ranking-list"></div>
+      <div class="info-box" id="ranking-empty" style="display:none;">No hay builds dentro de ese rango de precio.</div>
+
+      <div id="ranking-chart-section">
+        <div class="divider"></div>
+        <div class="chart-title">📊 Score vs Precio</div>
+        <div class="chart-wrap"><canvas id="ranking-chart"></canvas></div>
+      </div>
+    </section>
+
+    <!-- ════════════════════════════════ PRESUPUESTO ════════════════════════════════ -->
+    <section class="section" id="section-presupuesto">
+      <div class="section-header">
+        <h1>💰 <span>PRESUPUESTO</span> PC</h1>
+        <p>Agrega los componentes que quieres comprar, ingresa sus precios y calcula el total en USD.</p>
+      </div>
+
+      <h4>➕ Agregar componente</h4>
+      <div class="budget-form">
+        <select id="budget-tipo"></select>
+        <input type="text" id="budget-nombre" placeholder="Ej: RTX 4070 Ti MSI">
+        <input type="number" id="budget-precio" placeholder="Precio USD" min="0" step="1">
+        <button class="btn-add" id="budget-add">➕ Añadir</button>
+      </div>
+      <div class="info-box" id="budget-warning" style="display:none;"></div>
+
+      <div class="divider"></div>
+
+      <div id="budget-empty" class="info-box">Aún no has agregado componentes. Usa el formulario de arriba para comenzar.</div>
+
+      <div id="budget-content" style="display:none;">
+        <h4>🗂️ Lista de componentes</h4>
+        <table class="budget-list" id="budget-table"></table>
+
+        <div class="divider"></div>
+
+        <div class="budget-summary-grid">
+          <div>
+            <h4>🥧 Distribución del gasto</h4>
+            <div class="chart-wrap"><canvas id="budget-chart"></canvas></div>
+          </div>
+          <div>
+            <h4>💵 Resumen</h4>
+            <div class="budget-total">
+              <p>Total estimado</p>
+              <h2 id="budget-total-value">$0.00 USD</h2>
+              <p id="budget-count">0 componente(s)</p>
+            </div>
+            <div class="metric-card">
+              <div class="metric-label">Componente más caro</div>
+              <div class="metric-value" id="budget-max-name">-</div>
+              <div class="metric-delta" id="budget-max-price"></div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-label">Promedio por componente</div>
+              <div class="metric-value" id="budget-avg"></div>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top:16px;">
+          <button class="btn-secondary" id="budget-clear">🗑️ Limpiar toda la lista</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ════════════════════════════════ VIDA ÚTIL ════════════════════════════════ -->
+    <section class="section" id="section-vidautil">
+      <div class="section-header">
+        <h1>⏳ <span>VIDA ÚTIL</span> DEL HARDWARE</h1>
+        <p>Estimación de años de uso recomendado y para qué resoluciones sigue siendo viable cada componente.</p>
+      </div>
+
+      <div class="tabs">
+        <button class="tab-btn active" data-lifetab="cpu">Procesadores</button>
+        <button class="tab-btn" data-lifetab="gpu">Tarjetas Gráficas</button>
+      </div>
+
+      <div class="tab-panel active" id="life-cpu">
+        <div class="cards-grid" id="life-cpu-cards"></div>
+      </div>
+      <div class="tab-panel" id="life-gpu">
+        <div class="cards-grid" id="life-gpu-cards"></div>
+      </div>
+
+      <div class="divider"></div>
+      <p class="legend-note">
+        📌 <b>Recomendado:</b> rendimiento fluido sin cuellos de botella &nbsp;|&nbsp;
+        🟡 <b>Aceptable:</b> funcional pero con compromisos (bajar settings/resolución) &nbsp;|&nbsp;
+        🔴 <b>Limitado:</b> probablemente no entregue una experiencia satisfactoria.
+      </p>
+    </section>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("./service-worker.js").catch(() => {});
+      });
+    }
+  </script>
+</body>
+</html>
