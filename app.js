@@ -331,11 +331,9 @@ function renderRanking() {
   const filtrados = RANKINGS_PC.filter(b => b.precio <= maxPrice);
   const listEl = document.getElementById("ranking-list");
   const emptyEl = document.getElementById("ranking-empty");
-  const chartSection = document.getElementById("ranking-chart-section");
   listEl.innerHTML = "";
-  if (filtrados.length === 0) { emptyEl.style.display = "block"; chartSection.style.display = "none"; return; }
+  if (filtrados.length === 0) { emptyEl.style.display = "block"; return; }
   emptyEl.style.display = "none";
-  chartSection.style.display = "block";
   filtrados.forEach((build, idx) => {
     const pos = idx + 1;
     const medalClass = pos === 1 ? "gold" : pos === 2 ? "silver" : pos === 3 ? "bronze" : "";
@@ -352,43 +350,6 @@ function renderRanking() {
           <div class="rank-price">$${build.precio.toLocaleString("en-US")} USD</div>
         </div>
       </div>`;
-  });
-  renderRankingChart(filtrados);
-}
-
-function renderRankingChart(filtrados) {
-  destroyChart("ranking-chart");
-  const ctx = document.getElementById("ranking-chart");
-  const scores = filtrados.map(b => b.score);
-  const minS = Math.min(...scores), maxS = Math.max(...scores);
-  function scoreToColor(s) {
-    const t = maxS === minS ? 0.5 : (s - minS) / (maxS - minS);
-    if (t < 0.5) return interpolateColor("#e3b341", LIME_D, t * 2);
-    return interpolateColor(LIME_D, LIME, (t - 0.5) * 2);
-  }
-  new Chart(ctx, {
-    type: "scatter",
-    data: {
-      datasets: [{
-        label: "Builds",
-        data: filtrados.map(b => ({ x: b.precio, y: b.score, label: b.nombre })),
-        backgroundColor: filtrados.map(b => scoreToColor(b.score)),
-        pointRadius: filtrados.map(b => 6 + (b.score / 100) * 14),
-        pointHoverRadius: filtrados.map(b => 8 + (b.score / 100) * 14)
-      }]
-    },
-    options: {
-      ...chartDefaultOptions,
-      plugins: {
-        ...chartDefaultOptions.plugins,
-        legend: { display: false },
-        tooltip: { ...chartDefaultOptions.plugins.tooltip, callbacks: { label: (ctx) => `${ctx.raw.label}: $${ctx.raw.x.toLocaleString("en-US")} | Score ${ctx.raw.y}` } }
-      },
-      scales: {
-        x: { ...chartDefaultOptions.scales.x, title: { display: true, text: "Precio (USD)", color: GREY } },
-        y: { ...chartDefaultOptions.scales.y, title: { display: true, text: "Score", color: GREY } }
-      }
-    }
   });
 }
 
